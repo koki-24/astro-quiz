@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>12星座・運勢診断クイズ</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            background: #05071a;
+            color: #d4af37;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            position: relative;
+            overflow-x: hidden;
+        }
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 50%),
+                        radial-gradient(circle at 20% 80%, rgba(100, 80, 200, 0.05) 0%, transparent 40%);
+            pointer-events: none;
+            z-index: 0;
+        }
+        .card {
+            background: rgba(5, 7, 26, 0.6);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            border: 1px solid rgba(212, 175, 55, 0.3);
+            max-width: 450px;
+            margin: auto;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5), inset 0 0 60px rgba(212, 175, 55, 0.03);
+            position: relative;
+            z-index: 1;
+        }
+        h2 { color: #d4af37; text-shadow: 0 0 20px rgba(212, 175, 55, 0.3); }
+        p { color: rgba(212, 175, 55, 0.95); }
+        button {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.25), rgba(180, 140, 50, 0.15));
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            color: #d4af37;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            margin: 10px;
+            transition: 0.3s;
+            width: 100%;
+        }
+        button:hover {
+            transform: scale(1.03);
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.35), rgba(180, 140, 50, 0.25));
+            box-shadow: 0 0 20px rgba(212, 175, 55, 0.2);
+        }
+        #result-area { display: none; }
+        .link-btn {
+            background: linear-gradient(135deg, rgba(212, 175, 55, 0.4), rgba(180, 140, 50, 0.3));
+            border: 1px solid rgba(212, 175, 55, 0.6);
+            font-weight: bold;
+        }
+        .share-buttons {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 20px 0;
+            flex-wrap: wrap;
+        }
+        .share-btn {
+            width: 48px;
+            height: 48px;
+            padding: 0;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 22px;
+            text-decoration: none;
+            transition: 0.3s;
+        }
+        .share-btn:hover { transform: scale(1.1); }
+        .share-x { background: #1da1f2; color: white; border: none; }
+        .share-fb { background: #1877f2; color: white; border: none; }
+        .share-line { background: #00b900; color: white; border: none; }
+        #particle-canvas {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9999;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="particle-canvas"></canvas>
+    <div class="card">
+        <div id="game-area">
+            <h2>✨ 星座クイズ診断 ✨</h2>
+            <p id="question">読み込み中...</p>
+            <div id="answers"></div>
+        </div>
+
+        <div id="result-area">
+            <h2>診断結果</h2>
+            <p id="result-text"></p>
+            <button class="link-btn" onclick="location.href='https://tsuitui-lab.com/'">さらに詳しく占う（ブログへ）</button>
+            <div class="share-buttons">
+                <a id="share-x" class="share-btn share-x" href="#" target="_blank" rel="noopener" title="Xでシェア">𝕏</a>
+                <a id="share-fb" class="share-btn share-fb" href="#" target="_blank" rel="noopener" title="Facebookでシェア">f</a>
+                <a id="share-line" class="share-btn share-line" href="#" target="_blank" rel="noopener" title="LINEでシェア">L</a>
+            </div>
+            <button onclick="location.reload()">もう一度挑戦</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { "q": "牡羊座が『一番許せない』と感じる相手の態度は？", "a": ["優柔不断で動かない", "陰口を言う", "束縛してくる"], "correct": "優柔不断で動かない" },
+            { "q": "牡牛座がストレスを感じた時に、ついついやってしまう行動は？", "a": ["爆買い・爆食い", "誰かに当たり散らす", "ひたすら寝る"], "correct": "爆買い・爆食い" },
+            { "q": "双子座の頭の中を占めている割合が一番高いのは？", "a": ["深い悩み", "次にやる楽しいこと", "過去の後悔"], "correct": "次にやる楽しいこと" },
+            { "q": "蟹座が『この人は仲間だ』と認める瞬間の決め手は？", "a": ["弱みを見せてくれた時", "才能を感じた時", "プレゼントをくれた時"], "correct": "弱みを見せてくれた時" },
+            { "q": "獅子座が密かに求めている、最高の褒め言葉は？", "a": ["「優しいね」", "「さすが、あなたしかいない」", "「頑張ったね」"], "correct": "「さすが、あなたしかいない」" },
+            { "q": "乙女座が他人の部屋に入った時、真っ先に目が行く場所は？", "a": ["部屋全体の雰囲気", "細かい汚れや散らかり", "置いてある本の内容"], "correct": "細かい汚れや散らかり" },
+            { "q": "天秤座が「NO」と言いたい時、ついつい取ってしまう態度は？", "a": ["はっきり断る", "愛想笑いで濁す", "連絡を遅らせる"], "correct": "愛想笑いで濁す" },
+            { "q": "蠍座が一度「裏切られた」と感じた相手への対応は？", "a": ["すぐに許す", "記憶から抹消（二度と関わらない）", "冷静に話し合う"], "correct": "記憶から抹消（二度と関わらない）" },
+            { "q": "射手座が「逃げ出したい！」と思う瞬間はどんな時？", "a": ["ルールに縛られた時", "一人にされた時", "責任を押し付けられた時"], "correct": "ルールに縛られた時" },
+            { "q": "山羊座が実は一番「誇りに思っていること」は？", "a": ["自分の才能", "積み上げてきた努力と結果", "人脈の広さ"], "correct": "積み上げてきた努力と結果" },
+            { "q": "水瓶座が「変わってるね」と言われた時の本心は？", "a": ["実は傷ついている", "最高の褒め言葉だと思っている", "何も感じない"], "correct": "最高の褒め言葉だと思っている" },
+            { "q": "魚座が恋に落ちる時、最も重要なポイントは？", "a": ["相手のスペック", "言葉にならない「雰囲気」", "共通の趣味"], "correct": "言葉にならない「雰囲気」" },
+            { "q": "火の星座（牡羊・獅子・射手）の共通の弱点は？", "a": ["飽きっぽい", "人見知り", "計算高い"], "correct": "飽きっぽい" },
+            { "q": "地の星座（牡牛・乙女・山羊）が最も安心する時間は？", "a": ["パーティー", "予定通りの1日", "知らない場所への旅行"], "correct": "予定通りの1日" },
+            { "q": "風の星座（双子・天秤・水瓶）が一番大切にしているものは？", "a": ["情熱", "情報の鮮度と自由", "伝統"], "correct": "情報の鮮度と自由" },
+            { "q": "水の星座（蟹・蠍・魚）が人付き合いで一番重視するのは？", "a": ["損得勘定", "心の繋がりと共感", "論理的な正しさ"], "correct": "心の繋がりと共感" },
+            { "q": "「ついつい」やってしまう、星座共通の開運アクションは？", "a": ["深呼吸", "笑顔を作る", "靴を揃える"], "correct": "笑顔を作る" },
+            { "q": "一番「ギャップ萌え」が激しいと言われがちな星座グループは？", "a": ["火の星座", "水の星座", "地の星座"], "correct": "水の星座" },
+            { "q": "12星座の中で、実は一番「秘密主義」なのは？", "a": ["双子座", "蠍座", "天秤座"], "correct": "蠍座" },
+            { "q": "2026年、最も運気が跳ね上がると言われているのは？", "a": ["今このゲームをしているあなた", "努力を惜しまない人", "どちらも正解！"], "correct": "どちらも正解！" }
+        ];
+        let currentIdx = 0;
+        let score = 0;
+
+        function showQuestion() {
+            const q = questions[currentIdx];
+            document.getElementById('question').innerText = q.q;
+            const container = document.getElementById('answers');
+            container.innerHTML = '';
+            q.a.forEach(ans => {
+                const btn = document.createElement('button');
+                btn.innerText = ans;
+                btn.onclick = () => next(ans);
+                container.appendChild(btn);
+            });
+        }
+
+        function createStarParticles() {
+            const canvas = document.getElementById('particle-canvas');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const stars = [];
+            const count = 80;
+            for (let i = 0; i < count; i++) {
+                stars.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 4 + 1,
+                    vx: (Math.random() - 0.5) * 3,
+                    vy: (Math.random() - 0.5) * 3 - 1,
+                    alpha: Math.random() * 0.8 + 0.2,
+                    twinkle: Math.random() * Math.PI * 2
+                });
+            }
+
+            let frame = 0;
+            const maxFrames = 120;
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                frame++;
+
+                stars.forEach(s => {
+                    s.x += s.vx;
+                    s.y += s.vy;
+                    s.twinkle += 0.1;
+                    const twinkle = Math.sin(s.twinkle) * 0.3 + 0.7;
+                    ctx.beginPath();
+                    ctx.arc(s.x, s.y, s.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(212, 175, 55, ${s.alpha * twinkle})`;
+                    ctx.fill();
+                });
+
+                if (frame < maxFrames) requestAnimationFrame(animate);
+                else canvas.style.display = 'none';
+            }
+            canvas.style.display = 'block';
+            animate();
+        }
+
+        function next(ans) {
+            const isCorrect = ans === questions[currentIdx].correct;
+            if (isCorrect) {
+                score++;
+                createStarParticles();
+            }
+
+            currentIdx++;
+            if (currentIdx < questions.length) {
+                setTimeout(() => showQuestion(), isCorrect ? 800 : 300);
+            } else {
+                setTimeout(() => showResult(), isCorrect ? 1200 : 500);
+            }
+        }
+
+        function showResult() {
+            document.getElementById('game-area').style.display = 'none';
+            document.getElementById('result-area').style.display = 'block';
+            const percent = Math.round((score / questions.length) * 100);
+            let msg = `全${questions.length}問中${score}問正解！ (${percent}%)`;
+            if (percent >= 90) msg += "\n\nあなたは『星を味方にする開運マスター』タイプです！";
+            else if (percent >= 70) msg += "\n\n星座の知識がしっかり身についています！";
+            else msg += "\n\nもう一度挑戦して、星座の世界を深めましょう！";
+            document.getElementById('result-text').innerText = msg;
+
+            const shareText = `12星座クイズで${score}/${questions.length}問正解！あなたも挑戦してみて✨`;
+            const shareUrl = encodeURIComponent(window.location.href);
+            document.getElementById('share-x').href = `https://twitter.com/intent/tweet?text=${encodeURIComponent(shareText)}&url=${shareUrl}`;
+            document.getElementById('share-fb').href = `https://www.facebook.com/sharer/sharer.php?u=${shareUrl}`;
+            document.getElementById('share-line').href = `https://line.me/R/msg/text/?${encodeURIComponent(shareText + ' ' + window.location.href)}`;
+        }
+
+        showQuestion();
+    </script>
+</body>
+</html>

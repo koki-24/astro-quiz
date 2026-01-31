@@ -6,11 +6,12 @@
     <title>ついつい図鑑：裏性格診断</title>
     <style>
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #1a1a2e; color: #fff; text-align: center; padding: 20px; }
-        #quiz-container { max-width: 500px; margin: 0 auto; background: #16213e; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        #constellation-image { width: 100%; border-radius: 15px; margin-bottom: 20px; display: none; } /* 最初は隠しておく */
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #e94560; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; }
+        #quiz-container { max-width: 500px; margin: 0 auto; background: #16213e; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-height: 400px; display: flex; flex-direction: column; justify-content: center; }
+        #constellation-image { width: 100%; border-radius: 15px; margin-bottom: 20px; display: none; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #e94560; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; }
         .btn:hover { background: #ff4d6d; }
-        #result { font-size: 20px; font-weight: bold; margin-top: 20px; }
+        #question { font-size: 18px; margin-bottom: 20px; line-height: 1.6; }
+        #result { font-size: 22px; font-weight: bold; margin-top: 20px; color: #f9d342; }
     </style>
 </head>
 <body>
@@ -19,24 +20,25 @@
     <div id="quiz-container">
         <img id="constellation-image" src="" alt="星座画像">
         
-        <div id="question-area">
-            <p id="question">あなたの「裏の顔」を暴く診断を始めますか？</p>
-            <button class="btn" onclick="startQuiz()">診断をスタートする</button>
+        <div id="quiz-content">
+            <p id="question">12星座の「裏の顔」を暴く<br>ガチ診断へようこそ</p>
+            <div id="answer-buttons">
+                <button class="btn" onclick="startQuiz()">診断をスタートする</button>
+            </div>
         </div>
-        <div id="answer-buttons"></div>
         <div id="result"></div>
     </div>
 
     <audio id="bgm" src="audio/Silent_Blueprint.mp3" loop></audio>
 
     <script>
-        // クイズデータ（画像パスを追加）
+        // クイズデータ
         const quizData = [
             { "q": "牡羊座が『一番許せない』と感じる相手の態度は？", "img": "images/01aries.jpg", "a": ["優柔不断で動かない", "陰口を言う", "束縛してくる"], "correct": "優柔不断で動かない" },
             { "q": "牡牛座がストレスを感じた時に、ついついやってしまう行動は？", "img": "images/02taurus.jpg", "a": ["爆買い・爆食い", "誰かに当たり散らす", "ひたすら寝る"], "correct": "爆買い・爆食い" },
             { "q": "双子座の頭の中を占めている割合が一番高いのは？", "img": "images/03gemini.jpg", "a": ["深い悩み", "次にやる楽しいこと", "過去の後悔"], "correct": "次にやる楽しいこと" },
             { "q": "蟹座が『この人は仲間だ』と認める瞬間の決め手は？", "img": "images/04cancer.jpg", "a": ["弱みを見せてくれた時", "才能を感じた時", "プレゼントをくれた時"], "correct": "弱みを見せてくれた時" },
-            { "q": "獅子座が密かに求めている、最高の褒め言葉は？", "img": "images/05leo.jpg", "a": ["「優しいね」", "「さすが、あなたしかいない」", "「頑張ったね」"], "correct": "「さすが、あなたしかいない」" },
+            { "q": "獅子座が密かに求めている、最高の褒め言葉は？", "img": "images/05leo.jpg", "a": ["「優しいね」", "「さすが、あなたしかいない」", "「頑張ったね」"], "correct": "「さすが, あなたしかいない」" },
             { "q": "乙女座が他人の部屋に入った時、真っ先に目が行く場所は？", "img": "images/06virgo.jpg", "a": ["部屋全体の雰囲気", "細かい汚れや散らかり", "置いてある本の内容"], "correct": "細かい汚れや散らかり" },
             { "q": "天秤座が「NO」と言いたい時、ついつい取ってしまう態度は？", "img": "images/07libra.jpg", "a": ["はっきり断る", "愛想笑いで濁す", "連絡を遅らせる"], "correct": "愛想笑いで濁す" },
             { "q": "蠍座が一度「裏切られた」と感じた相手への対応は？", "img": "images/08scorpio.jpg", "a": ["すぐに許す", "記憶から抹消（二度と関わらない）", "冷静に話し合う"], "correct": "記憶から抹消（二度と関わらない）" },
@@ -44,23 +46,27 @@
             { "q": "山羊座が実は一番「誇りに思っていること」は？", "img": "images/10capricorn.jpg", "a": ["自分の才能", "積み上げてきた努力と結果", "人脈の広さ"], "correct": "積み上げてきた努力と結果" },
             { "q": "水瓶座が「変わってるね」と言われた時の本心は？", "img": "images/11aquarius.jpg", "a": ["実は傷ついている", "最高の褒め言葉だと思っている", "何も感じない"], "correct": "最高の褒め言葉だと思っている" },
             { "q": "魚座が恋に落ちる時、最も重要なポイントは？", "img": "images/12pisces.jpg", "a": ["相手のスペック", "言葉にならない「雰囲気」", "共通の趣味"], "correct": "言葉にならない「雰囲気」" }
-            // 以降、共通問題（画像なし等）を続けることも可能
         ];
 
         let currentQuestionIndex = 0;
         let score = 0;
 
         function startQuiz() {
-            document.getElementById('bgm').play(); // BGM再生開始
-            document.getElementById('bgm').volume = 0.3; // 音量調節
+            // BGMの再生
+            const bgm = document.getElementById('bgm');
+            bgm.volume = 0.3;
+            bgm.play().catch(e => console.log("ブラウザの制限により自動再生できませんでした"));
+            
             showQuestion();
         }
 
         function showQuestion() {
             const quiz = quizData[currentQuestionIndex];
             const imgElement = document.getElementById('constellation-image');
-            
-            // 画像を表示（画像がある場合のみ）
+            const questionElement = document.getElementById('question');
+            const buttonContainer = document.getElementById('answer-buttons');
+
+            // 画像の表示
             if (quiz.img) {
                 imgElement.src = quiz.img;
                 imgElement.style.display = 'block';
@@ -68,10 +74,11 @@
                 imgElement.style.display = 'none';
             }
 
-            document.getElementById('question').innerText = quiz.q;
-            const buttonContainer = document.getElementById('answer-buttons');
-            buttonContainer.innerHTML = ''; // ボタンをリセット
+            // 問題文の書き換え
+            questionElement.innerText = quiz.q;
 
+            // ボタン（選択肢）の生成
+            buttonContainer.innerHTML = ''; 
             quiz.a.forEach(answer => {
                 const button = document.createElement('button');
                 button.innerText = answer;
@@ -93,10 +100,14 @@
         }
 
         function showResult() {
-            document.getElementById('quiz-container').innerHTML = `
+            const container = document.getElementById('quiz-container');
+            const accuracy = Math.round((score / quizData.length) * 100);
+            
+            container.innerHTML = `
                 <h2>診断終了！</h2>
-                <p id="result">あなたの「裏性格」一致度は ${Math.round((score/quizData.length)*100)}% でした！</p>
-                <p>もっと詳しく知りたい方は「ついつい図鑑」をチェック！</p>
+                <div id="result">裏性格一致度：${accuracy}%</div>
+                <p>あなたは自分自身の本性を<br>どれだけ受け入れられますか？</p>
+                <button class="btn" onclick="location.reload()">もう一度診断する</button>
             `;
         }
     </script>

@@ -8,15 +8,20 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #1a1a2e; color: #fff; text-align: center; padding: 20px; overflow-x: hidden; }
         #quiz-container { max-width: 500px; margin: 0 auto; background: #16213e; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-height: 450px; position: relative; }
         #constellation-image { width: 100%; border-radius: 15px; margin-bottom: 20px; display: none; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #444; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #444; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; text-decoration: none; }
         
-        /* 診断スタートボタンなどの通常ボタン */
         .primary-btn { background: #e94560; }
         .primary-btn:hover { background: #ff4d6d; transform: scale(1.02); }
 
-        /* 正解・不正解の演出用クラス */
-        .correct-btn { background: #28a745 !important; } /* 正解は緑 */
-        .wrong-btn { background: #dc3545 !important; }   /* 不正解は赤 */
+        /* SNSボタン用 */
+        .share-container { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
+        .share-btn { flex: 1; padding: 10px; font-size: 14px; border-radius: 5px; color: #fff; text-decoration: none; font-weight: bold; }
+        .x-btn { background: #000; }
+        .line-btn { background: #06c755; }
+        .yt-btn { background: #ff0000; margin-top: 15px; }
+
+        .correct-btn { background: #28a745 !important; }
+        .wrong-btn { background: #dc3545 !important; }
 
         #question { font-size: 18px; margin-bottom: 20px; line-height: 1.6; min-height: 3em; }
         #result { font-size: 22px; font-weight: bold; margin-top: 20px; color: #f9d342; }
@@ -55,12 +60,12 @@
 
         let currentQuestionIndex = 0;
         let score = 0;
-        let isAnswering = false; // 連続クリック防止用
+        let isAnswering = false;
 
         function startQuiz() {
             const bgm = document.getElementById('bgm');
             bgm.volume = 0.4;
-            bgm.play().catch(e => console.log("Music play blocked"));
+            bgm.play();
             showQuestion();
         }
 
@@ -86,25 +91,18 @@
         }
 
         function selectAnswer(clickedButton, selected, correct) {
-            if (isAnswering) return; // 判定中はクリック不可
+            if (isAnswering) return;
             isAnswering = true;
 
             const allButtons = document.querySelectorAll('.btn');
-            
             if (selected === correct) {
                 score++;
                 clickedButton.classList.add('correct-btn');
             } else {
                 clickedButton.classList.add('wrong-btn');
-                // 不正解のときは、正解のボタンを緑にする
-                allButtons.forEach(btn => {
-                    if (btn.innerText === correct) {
-                        btn.classList.add('correct-btn');
-                    }
-                });
+                allButtons.forEach(btn => { if (btn.innerText === correct) btn.classList.add('correct-btn'); });
             }
 
-            // 0.8秒待ってから次へ（正解を確認する時間を作る）
             setTimeout(() => {
                 currentQuestionIndex++;
                 if (currentQuestionIndex < quizData.length) {
@@ -118,14 +116,23 @@
         function showResult() {
             const container = document.getElementById('quiz-container');
             const accuracy = Math.round((score / quizData.length) * 100);
+            const shareText = encodeURIComponent(`【ついつい図鑑】私の裏性格一致度は${accuracy}%でした！あなたの本性も暴いてみる？ #ついつい図鑑`);
+            const shareUrl = encodeURIComponent(window.location.href);
+
             container.innerHTML = `
                 <h2>診断終了！</h2>
                 <div id="result">裏性格一致度：${accuracy}%</div>
+                
+                <div class="share-container">
+                    <a href="https://twitter.com/intent/tweet?text=${shareText}&url=${shareUrl}" target="_blank" class="share-btn x-btn">Xでシェア</a>
+                    <a href="https://social-plugins.line.me/lineit/share?url=${shareUrl}" target="_blank" class="share-btn line-btn">LINEで送る</a>
+                </div>
+
+                <a href="https://www.youtube.com/@AuralumeMusic" target="_blank" class="btn yt-btn">YouTubeで星座BGMを聴く</a>
+                
                 <button class="btn primary-btn" onclick="location.reload()">もう一度診断する</button>
             `;
         }
     </script>
 </body>
 </html>
-
-

@@ -8,18 +8,17 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #1a1a2e; color: #fff; text-align: center; padding: 20px; overflow-x: hidden; }
         #quiz-container { max-width: 500px; margin: 0 auto; background: #16213e; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-height: 450px; position: relative; }
         #constellation-image { width: 100%; border-radius: 15px; margin-bottom: 20px; display: none; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #e94560; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; }
-        .btn:hover { background: #ff4d6d; transform: scale(1.02); }
-        #question { font-size: 18px; margin-bottom: 20px; line-height: 1.6; min-height: 3em; }
+        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #444; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; }
         
-        /* 正解時のキラキラエフェクト */
-        .correct-flash { animation: flash-white 0.5s ease-out; }
-        @keyframes flash-white {
-            0% { background-color: #16213e; }
-            50% { background-color: #ffffff; }
-            100% { background-color: #16213e; }
-        }
+        /* 診断スタートボタンなどの通常ボタン */
+        .primary-btn { background: #e94560; }
+        .primary-btn:hover { background: #ff4d6d; transform: scale(1.02); }
 
+        /* 正解・不正解の演出用クラス */
+        .correct-btn { background: #28a745 !important; } /* 正解は緑 */
+        .wrong-btn { background: #dc3545 !important; }   /* 不正解は赤 */
+
+        #question { font-size: 18px; margin-bottom: 20px; line-height: 1.6; min-height: 3em; }
         #result { font-size: 22px; font-weight: bold; margin-top: 20px; color: #f9d342; }
     </style>
 </head>
@@ -31,7 +30,7 @@
         <div id="quiz-content">
             <p id="question">12星座の「裏の顔」を暴く<br>ガチ診断へようこそ</p>
             <div id="answer-buttons">
-                <button class="btn" onclick="startQuiz()">診断をスタートする</button>
+                <button class="btn primary-btn" onclick="startQuiz()">診断をスタートする</button>
             </div>
         </div>
     </div>
@@ -40,7 +39,7 @@
 
     <script>
         const quizData = [
-            { "q": "牡羊座が『一番許せない』と感じる相手の態度は？", "img": "images/01aries.jpg", "a": ["優優不断で動かない", "陰口を言う", "束縛してくる"], "correct": "優柔不断で動かない" },
+            { "q": "牡羊座が『一番許せない』と感じる相手の態度は？", "img": "images/01aries.jpg", "a": ["優柔不断で動かない", "陰口を言う", "束縛してくる"], "correct": "優柔不断で動かない" },
             { "q": "牡牛座がストレスを感じた時に、ついついやってしまう行動は？", "img": "images/02taurus.jpg", "a": ["爆買い・爆食い", "誰かに当たり散らす", "ひたすら寝る"], "correct": "爆買い・爆食い" },
             { "q": "双子座の頭の中を占めている割合が一番高いのは？", "img": "images/03gemini.jpg", "a": ["深い悩み", "次にやる楽しいこと", "過去の後悔"], "correct": "次にやる楽しいこと" },
             { "q": "蟹座が『この人は仲間だ』と認める瞬間の決め手は？", "img": "images/04cancer.jpg", "a": ["弱みを見せてくれた時", "才能を感じた時", "プレゼントをくれた時"], "correct": "弱みを見せてくれた時" },
@@ -49,31 +48,24 @@
             { "q": "天秤座が「NO」と言いたい時、ついつい取ってしまう態度は？", "img": "images/07libra.jpg", "a": ["はっきり断る", "愛想笑いで濁す", "連絡を遅らせる"], "correct": "愛想笑いで濁す" },
             { "q": "蠍座が一度「裏切られた」と感じた相手への対応は？", "img": "images/08scorpio.jpg", "a": ["すぐに許す", "記憶から抹消（二度と関わらない）", "冷静に話し合う"], "correct": "記憶から抹消（二度と関わらない）" },
             { "q": "射手座が「逃げ出したい！」と思う瞬間はどんな時？", "img": "images/09sagittarius.jpg", "a": ["ルールに縛られた時", "一人にされた時", "責任を押し付けられた時"], "correct": "ルールに縛られた時" },
-            { "q": "山羊座が実は一番「誇りに思っていること」は？", "img": "images/10capricorn.jpg", "a": ["自分の才能", "積み上げてきた努力と結果", "人脈の広さ"], "correct": "積み上げてきた努力と結果" },
-            { "q": "水瓶座が「変わってるね」と言われた時の本心は？", "img": "images/11aquarius.jpg", "a": ["実は傷ついている", "最高の褒め言葉だと思っている", "何も感じない"], "correct": "最高の褒め言葉だと思っている" },
-            { "q": "魚座が恋に落ちる時、最も重要なポイントは？", "img": "images/12pisces.jpg", "a": ["相手のスペック", "言葉にならない「雰囲気」", "共通の趣味"], "correct": "言葉にならない「雰囲気」" }
+            { "q": "山羊座が実は一番「誇りに思っていること」は？", "img": "10capricorn.jpg", "a": ["自分の才能", "積み上げてきた努力と結果", "人脈の広さ"], "correct": "積み上げてきた努力と結果" },
+            { "q": "水瓶座が「変わってるね」と言われた時の本心は？", "img": "11aquarius.jpg", "a": ["実は傷ついている", "最高の褒め言葉だと思っている", "何も感じない"], "correct": "最高の褒め言葉だと思っている" },
+            { "q": "魚座が恋に落ちる時、最も重要なポイントは？", "img": "12pisces.jpg", "a": ["相手のスペック", "言葉にならない「雰囲気」", "共通の趣味"], "correct": "言葉にならない「雰囲気」" }
         ];
 
         let currentQuestionIndex = 0;
         let score = 0;
-
-        // 画像のプリロード（遅延対策）
-        function preloadImages() {
-            quizData.forEach(data => {
-                const img = new Image();
-                img.src = data.img;
-            });
-        }
-        preloadImages();
+        let isAnswering = false; // 連続クリック防止用
 
         function startQuiz() {
             const bgm = document.getElementById('bgm');
             bgm.volume = 0.4;
-            bgm.play();
+            bgm.play().catch(e => console.log("Music play blocked"));
             showQuestion();
         }
 
         function showQuestion() {
+            isAnswering = false;
             const quiz = quizData[currentQuestionIndex];
             const imgElement = document.getElementById('constellation-image');
             const questionElement = document.getElementById('question');
@@ -87,29 +79,40 @@
             quiz.a.forEach(answer => {
                 const button = document.createElement('button');
                 button.innerText = answer;
-                button.classList.add('btn');
-                button.onclick = () => selectAnswer(answer, quiz.correct);
+                button.classList.add('btn', 'primary-btn');
+                button.onclick = () => selectAnswer(button, answer, quiz.correct);
                 buttonContainer.appendChild(button);
             });
         }
 
-        function selectAnswer(selected, correct) {
-            const container = document.getElementById('quiz-container');
+        function selectAnswer(clickedButton, selected, correct) {
+            if (isAnswering) return; // 判定中はクリック不可
+            isAnswering = true;
+
+            const allButtons = document.querySelectorAll('.btn');
             
             if (selected === correct) {
                 score++;
-                // 正解時のキラキラ（フラッシュ）エフェクト
-                container.classList.add('correct-flash');
-                setTimeout(() => container.classList.remove('correct-flash'), 500);
+                clickedButton.classList.add('correct-btn');
+            } else {
+                clickedButton.classList.add('wrong-btn');
+                // 不正解のときは、正解のボタンを緑にする
+                allButtons.forEach(btn => {
+                    if (btn.innerText === correct) {
+                        btn.classList.add('correct-btn');
+                    }
+                });
             }
 
-            // 不正解でも正解でも、すぐに次の問題へ
-            currentQuestionIndex++;
-            if (currentQuestionIndex < quizData.length) {
-                showQuestion();
-            } else {
-                showResult();
-            }
+            // 0.8秒待ってから次へ（正解を確認する時間を作る）
+            setTimeout(() => {
+                currentQuestionIndex++;
+                if (currentQuestionIndex < quizData.length) {
+                    showQuestion();
+                } else {
+                    showResult();
+                }
+            }, 800);
         }
 
         function showResult() {
@@ -118,8 +121,7 @@
             container.innerHTML = `
                 <h2>診断終了！</h2>
                 <div id="result">裏性格一致度：${accuracy}%</div>
-                <p>診断結果はいかがでしたか？<br>あなたの本性が暴かれたかもしれません。</p>
-                <button class="btn" onclick="location.reload()">もう一度診断する</button>
+                <button class="btn primary-btn" onclick="location.reload()">もう一度診断する</button>
             `;
         }
     </script>

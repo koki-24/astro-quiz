@@ -13,12 +13,15 @@
         .primary-btn { background: #e94560; }
         .primary-btn:hover { background: #ff4d6d; transform: scale(1.02); }
 
-        /* SNSボタン用 */
+        /* SNS・外部リンクボタン用 */
         .share-container { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
         .share-btn { flex: 1; padding: 10px; font-size: 14px; border-radius: 5px; color: #fff; text-decoration: none; font-weight: bold; }
         .x-btn { background: #000; }
         .line-btn { background: #06c755; }
+        
+        /* 誘導ボタン */
         .yt-btn { background: #ff0000; margin-top: 15px; }
+        .blog-btn { background: #2c7cff; }
 
         .correct-btn { background: #28a745 !important; }
         .wrong-btn { background: #dc3545 !important; }
@@ -119,6 +122,10 @@
             const shareText = encodeURIComponent(`【ついつい図鑑】私の裏性格一致度は${accuracy}%でした！あなたの本性も暴いてみる？ #ついつい図鑑`);
             const shareUrl = encodeURIComponent(window.location.href);
 
+            // 正しいURLを設定
+            const youtubeUrl = "https://www.youtube.com/channel/UCcUSri5_vS6Zwe9TXnRAI6g";
+            const blogUrl = "https://tsuitui-lab.com/";
+
             container.innerHTML = `
                 <h2>診断終了！</h2>
                 <div id="result">裏性格一致度：${accuracy}%</div>
@@ -128,9 +135,10 @@
                     <a href="https://social-plugins.line.me/lineit/share?url=${shareUrl}" target="_blank" class="share-btn line-btn">LINEで送る</a>
                 </div>
 
-                <a href="https://www.youtube.com/@AuralumeMusic" target="_blank" class="btn yt-btn">YouTubeで星座BGMを聴く</a>
+                <a href="${youtubeUrl}" target="_blank" class="btn yt-btn">ついつい図鑑 YouTubeを見る</a>
+                <a href="${blogUrl}" target="_blank" class="btn blog-btn">ついつい研究所（ブログ）を読む</a>
                 
-                <button class="btn primary-btn" onclick="location.reload()">もう一度診断する</button>
+                <button class="btn primary-btn" onclick="location.reload()" style="margin-top:20px;">もう一度診断する</button>
             `;
         }
     </script>

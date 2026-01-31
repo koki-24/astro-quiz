@@ -8,26 +8,28 @@
         body { font-family: 'Helvetica Neue', Arial, sans-serif; background-color: #1a1a2e; color: #fff; text-align: center; padding: 20px; overflow-x: hidden; }
         #quiz-container { max-width: 500px; margin: 0 auto; background: #16213e; padding: 20px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); min-height: 450px; position: relative; }
         #constellation-image { width: 100%; border-radius: 15px; margin-bottom: 20px; display: none; }
-        .btn { display: block; width: 100%; padding: 15px; margin: 10px 0; background: #444; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; text-decoration: none; }
+        
+        /* ボタンの基本スタイル（すべて共通の横幅に設定） */
+        .btn { display: block; width: 100%; box-sizing: border-box; padding: 15px; margin: 10px 0; color: #fff; border: none; border-radius: 10px; cursor: pointer; font-size: 16px; font-weight: bold; transition: 0.2s; text-decoration: none; }
         
         .primary-btn { background: #e94560; }
-        .primary-btn:hover { background: #ff4d6d; transform: scale(1.02); }
+        .primary-btn:hover { background: #ff4d6d; transform: scale(1.01); }
 
-        /* SNS・外部リンクボタン用 */
-        .share-container { display: flex; gap: 10px; justify-content: center; margin-top: 20px; }
-        .share-btn { flex: 1; padding: 10px; font-size: 14px; border-radius: 5px; color: #fff; text-decoration: none; font-weight: bold; }
+        /* SNS共有ボタン（ここだけは2つ並び） */
+        .share-container { display: flex; gap: 10px; justify-content: center; margin-top: 20px; margin-bottom: 5px; }
+        .share-btn { flex: 1; padding: 12px; font-size: 14px; border-radius: 8px; color: #fff; text-decoration: none; font-weight: bold; }
         .x-btn { background: #000; }
         .line-btn { background: #06c755; }
         
-        /* 誘導ボタン */
-        .yt-btn { background: #ff0000; margin-top: 15px; }
+        /* 外部リンクボタン（サイズを統一） */
+        .yt-btn { background: #ff0000; }
         .blog-btn { background: #2c7cff; }
 
         .correct-btn { background: #28a745 !important; }
         .wrong-btn { background: #dc3545 !important; }
 
         #question { font-size: 18px; margin-bottom: 20px; line-height: 1.6; min-height: 3em; }
-        #result { font-size: 22px; font-weight: bold; margin-top: 20px; color: #f9d342; }
+        #result { font-size: 22px; font-weight: bold; margin-top: 20px; margin-bottom: 10px; color: #f9d342; }
     </style>
 </head>
 <body>
@@ -68,7 +70,7 @@
         function startQuiz() {
             const bgm = document.getElementById('bgm');
             bgm.volume = 0.4;
-            bgm.play();
+            bgm.play().catch(e => console.log("Music error"));
             showQuestion();
         }
 
@@ -122,7 +124,6 @@
             const shareText = encodeURIComponent(`【ついつい図鑑】私の裏性格一致度は${accuracy}%でした！あなたの本性も暴いてみる？ #ついつい図鑑`);
             const shareUrl = encodeURIComponent(window.location.href);
 
-            // 正しいURLを設定
             const youtubeUrl = "https://www.youtube.com/channel/UCcUSri5_vS6Zwe9TXnRAI6g";
             const blogUrl = "https://tsuitui-lab.com/";
 
@@ -138,7 +139,7 @@
                 <a href="${youtubeUrl}" target="_blank" class="btn yt-btn">ついつい図鑑 YouTubeを見る</a>
                 <a href="${blogUrl}" target="_blank" class="btn blog-btn">ついつい研究所（ブログ）を読む</a>
                 
-                <button class="btn primary-btn" onclick="location.reload()" style="margin-top:20px;">もう一度診断する</button>
+                <button class="btn primary-btn" onclick="location.reload()">もう一度診断する</button>
             `;
         }
     </script>
